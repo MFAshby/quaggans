@@ -32,7 +32,7 @@ def get_quaggan_image(width, height):
     from random import choice
     quaggan_image_url = choice(quaggan_image_urls)
     image = get_image(quaggan_image_url)
-    scale = calculate_scale(image.size)
+    scale = calculate_scale(image.size, width, height)
     new_width = int(scale * original_width)
     new_height = int(scale * original_height)
     scaled_image = image.resize((new_width, new_height))
@@ -44,13 +44,19 @@ def get_quaggan_image(width, height):
     bottom_crop = int(new_height - vertical_crop) - 1
     return scaled_image.crop((left_crop, top_crop, right_crop, bottom_crop))
 
-def calculate_scale(size)
+def calculate_scale(size, width, height):
     original_width, original_height = size
     width_scale = float(width) / float(original_width)
     height_scale = float(height) / float(original_height)
-    # choose the larger scale so as to fill the whole requested size.
-    return width_scale if width_scale > height_scale else height_scale
+    return clamped_scale(width_scale, height_scale)
 
+def clamped_scale(width_scale, height_scale):
+    # choose the larger scale so as to fill the whole requested size.
+    major, minor = (width_scale, height_scale) if width_scale > height_scale else (height_scale, width_scale)
+    if major/minor > 3:
+        return minor * 3
+    else:
+        return major
 
 done_init = False
 
