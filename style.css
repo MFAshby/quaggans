@@ -1,0 +1,51 @@
+body {
+background: #E9F2F9;
+font-family: Muli, Arial, Verdana, sans-serif;
+font-size: 14px;
+}
+
+a {
+color:	#3C8DC5;
+}
+
+#wrapper {
+width: 704px;
+padding: 20px;
+margin: 0 auto;
+background-color: #B2D1E5;
+-webkit-border-radius: 50px 50px 50px 50px;
+border-radius: 50px 50px 50px 50px;
+
+}
+
+#image1 {
+float:right;
+margin: 1px;
+
+}
+
+#image2 {
+float:right;
+margin: 1px;
+
+}
+
+#image3 {
+float:right;
+margin: 1px;
+
+}
+
+
+#image4 {
+clear:both;
+margin: 2px;
+
+}
+
+
+#footer {
+
+
+
+}
