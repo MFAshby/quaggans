@@ -28,11 +28,11 @@ def init_quaggan_image_urls():
         quaggan_image_urls.append(quaggan_image_url)
 
 
-def get_quaggan_image(width, height):
+def get_quaggan_image(width, height, clamp):
     from random import choice
     quaggan_image_url = choice(quaggan_image_urls)
     image = get_image(quaggan_image_url)
-    scale = calculate_scale(image.size, width, height)
+    scale = calculate_scale(image.size, width, height, clamp, clamp_factor)
     new_width = int(scale * original_width)
     new_height = int(scale * original_height)
     scaled_image = image.resize((new_width, new_height))
@@ -44,17 +44,15 @@ def get_quaggan_image(width, height):
     bottom_crop = int(new_height - vertical_crop) - 1
     return scaled_image.crop((left_crop, top_crop, right_crop, bottom_crop))
 
-def calculate_scale(size, width, height):
+def calculate_scale(size, width, height, clamp, clamp_factor):
+    clamp_factor = clamp_factor or 3
     original_width, original_height = size
     width_scale = float(width) / float(original_width)
     height_scale = float(height) / float(original_height)
-    return clamped_scale(width_scale, height_scale)
-
-def clamped_scale(width_scale, height_scale):
     # choose the larger scale so as to fill the whole requested size.
     major, minor = (width_scale, height_scale) if width_scale > height_scale else (height_scale, width_scale)
-    if major/minor > 3:
-        return minor * 3
+    if clamp and major/minor > clamp_factor:
+        return minor * clamp_factor
     else:
         return major
 
@@ -76,13 +74,15 @@ def application(environ, start_response):
         request_params = parse_qs(environ["QUERY_STRING"])
         width = int(request_params["width"][0])
         height = int(request_params["height"][0])
+        clamp = bool(request_params.get("clamp", [0])[0])
+        clamp_factor = int(request_params.get("clamp_factor", [0])[0])
         print("serving request! request_params = " + str(request_params), file=log_file)
         width = int(width)
         height = int(height)
 
         from io import BytesIO
         output = BytesIO()
-        image = get_quaggan_image(width, height)
+        image = get_quaggan_image(width, height, clamp, clamp_factor)
         image.save(output, format='JPEG')
         start_response('200 OK', [("Content-type", "image/jpeg")])
         return [output.getvalue()]
