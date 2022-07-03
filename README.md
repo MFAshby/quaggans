@@ -1,3 +1,7 @@
+## Moved!
+
+This code has moved to https://code.mfashby.net/code/var/fossil/quaggans 
+
 # quaggans
 quaggan placeholder images for web devs who love guild wars!
 
